@@ -14,12 +14,16 @@ import {
 } from "@mui/material";
 import { Menu as MenuIcon, Dashboard, Logout } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
-const AppLayout = ({ children }) => {
+const AppLayout = ({ children, activeView, setActiveView }) => {
   const [open, setOpen] = React.useState(true);
   const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const role = localStorage.getItem("role"); 
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -28,9 +32,11 @@ const AppLayout = ({ children }) => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      
-      {/* Top AppBar */}
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
@@ -46,7 +52,6 @@ const AppLayout = ({ children }) => {
         </Toolbar>
       </AppBar>
 
-      {/* Drawer */}
       <Drawer
         variant="persistent"
         anchor="left"
@@ -62,18 +67,39 @@ const AppLayout = ({ children }) => {
       >
         <Toolbar />
         <List>
-          <ListItem button>
-            <ListItemIcon><Dashboard /></ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItem>
+            <ListItem button onClick={() => setActiveView("dashboard")}> 
+              <ListItemIcon>
+                <Dashboard />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItem>
+
+          {role === "admin" && (
+            <>
+              <ListItem button onClick={() => setActiveView("addTeacher")}>
+                <ListItemText primary="Add Teacher" />
+              </ListItem>
+              <ListItem button onClick={() => setActiveView("addStudent")}>
+                <ListItemText primary="Add Student" />
+              </ListItem>
+              <ListItem button onClick={() => setActiveView("viewTeachers")}>
+                <ListItemText primary="View Teachers" />
+              </ListItem>
+              <ListItem button onClick={() => setActiveView("viewStudents")}>
+                <ListItemText primary="View Students" />
+              </ListItem>
+            </>
+          )}
+
           <ListItem button onClick={logout}>
-            <ListItemIcon><Logout /></ListItemIcon>
+            <ListItemIcon>
+              <Logout />
+            </ListItemIcon>
             <ListItemText primary="Logout" />
           </ListItem>
         </List>
       </Drawer>
 
-      {/* Main Content */}
       <Box
         component="main"
         sx={{
