@@ -1,18 +1,27 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import axiosInstance from "../interceptor";
 
 const AuthContext = createContext();
-
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const access = localStorage.getItem("access_token");
+    const refresh = localStorage.getItem("refresh_token");
+    const role = localStorage.getItem("role");
+
+    if (access && refresh && role) {
+      setUser({ access, refresh, role });
+    }
+
+    setLoading(false); 
+  }, []);
 
   const login = async (credentials) => {
-
     try {
       const response = await axiosInstance.post("/token/", credentials);
-
       const { access, refresh, role } = response.data;
 
       localStorage.setItem("access_token", access);
@@ -20,7 +29,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("role", role);
 
       setUser({ access, refresh, role });
-      return role; // ✅ Let caller decide what to do
+      return role;
     } catch (error) {
       console.error("Login failed:", error.response?.data || error.message);
       throw error;
@@ -35,7 +44,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

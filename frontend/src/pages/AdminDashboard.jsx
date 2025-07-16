@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import AppLayout from "../layouts/AppLayout";
 import AddTeacherForm from "../components/AddTeacherForm";
+import AddStudentForm from "../components/AddStudentForm";
 import ViewTeachers from "../components/ViewTeachers";
+import ViewStudents from "../components/ViewStudents";
 
 const AdminDashboard = () => {
   const [activeView, setActiveView] = useState("dashboard");
@@ -12,6 +14,10 @@ const AdminDashboard = () => {
         return <AddTeacherForm />;
       case "viewTeachers":
         return <ViewTeachers />;
+      case "addStudent":
+        return <AddStudentForm />;
+      case "viewStudents":
+        return <ViewStudents />;
       default:
         return (
           <>
