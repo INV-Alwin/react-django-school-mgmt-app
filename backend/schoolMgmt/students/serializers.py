@@ -2,9 +2,12 @@ from rest_framework import serializers
 from .models import Student
 from users.models import User
 from users.serializers import UserSerializer  
+from teachers.models import Teacher
+from django.core.exceptions import ValidationError
 
 class StudentSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    assigned_teacher = serializers.CharField()  
 
     class Meta:
         model = Student
@@ -33,6 +36,14 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
+        teacher_name = validated_data.pop('assigned_teacher')
+
+        try:
+            # Split the full name into first and last name
+            first_name, last_name = teacher_name.strip().split(" ", 1)
+            teacher = Teacher.objects.get(user__first_name=first_name, user__last_name=last_name)
+        except (ValueError, Teacher.DoesNotExist):
+            raise ValidationError({"assigned_teacher": "Teacher not found with given full name."})
 
         user = User.objects.create_user(
             username=user_data['email'],
@@ -44,5 +55,14 @@ class StudentSerializer(serializers.ModelSerializer):
             phone_number=user_data['phone_number']
         )
 
-        student = Student.objects.create(user=user, **validated_data)
+        student = Student.objects.create(user=user, assigned_teacher=teacher, **validated_data)
         return student
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        teacher = instance.assigned_teacher
+        if teacher:
+            representation['assigned_teacher'] = teacher.user.get_full_name()
+        else:
+            representation['assigned_teacher'] = None
+        return representation
