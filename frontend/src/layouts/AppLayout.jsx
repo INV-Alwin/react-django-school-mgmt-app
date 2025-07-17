@@ -91,6 +91,14 @@ const AppLayout = ({ children, activeView, setActiveView }) => {
             </>
           )}
 
+          {role === "teacher" && (
+            <>
+              <ListItem button onClick={() => setActiveView("viewStudents")}>
+                <ListItemText primary="View Students" />
+              </ListItem>
+            </>
+          )}
+
           <ListItem button onClick={logout}>
             <ListItemIcon>
               <Logout />

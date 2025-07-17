@@ -72,14 +72,14 @@ const ViewStudents = () => {
         <Button
           variant="outlined"
           disabled={!prevPage}
-          onClick={() => setCurrentUrl(new URL(prevPage).pathname + new URL(prevPage).search)}
+          onClick={() => setCurrentUrl(prevPage)}
         >
           Previous
         </Button>
         <Button
           variant="outlined"
           disabled={!nextPage}
-          onClick={() => setCurrentUrl(new URL(nextPage).pathname + new URL(nextPage).search)}
+          onClick={() => setCurrentUrl(nextPage)}
         >
           Next
         </Button>
