@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AppLayout from "../layouts/AppLayout";
+import withLogout from "../hoc/withLogout";
 import ViewStudents from "../components/ViewStudents";
 import { useSelector } from "react-redux";
 
@@ -7,6 +8,9 @@ import { useSelector } from "react-redux";
 const AdminDashboard = () => {
   const [activeView, setActiveView] = useState("dashboard");
   const name = useSelector((state) => state.user.name);
+
+  const AppLayoutWithLogout = withLogout(AppLayout);
+  
   const renderContent = () => {
     switch (activeView) {
       case "viewStudents":
@@ -22,9 +26,10 @@ const AdminDashboard = () => {
   };
 
   return (
-    <AppLayout activeView={activeView} setActiveView={setActiveView}>
+
+    <AppLayoutWithLogout activeView={activeView} setActiveView={setActiveView}>
       {renderContent()}
-    </AppLayout>
+    </AppLayoutWithLogout>
   );
 };
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AppLayout from "../layouts/AppLayout";
+import withLogout from "../hoc/withLogout";
 import AddTeacherForm from "../components/AddTeacherForm";
 import AddStudentForm from "../components/AddStudentForm";
 import ViewTeachers from "../components/ViewTeachers";
@@ -7,6 +8,7 @@ import ViewStudents from "../components/ViewStudents";
 
 const AdminDashboard = () => {
   const [activeView, setActiveView] = useState("dashboard");
+  const AppLayoutWithLogout = withLogout(AppLayout);
 
   const renderContent = () => {
     switch (activeView) {
@@ -29,9 +31,9 @@ const AdminDashboard = () => {
   };
 
   return (
-    <AppLayout activeView={activeView} setActiveView={setActiveView}>
+    <AppLayoutWithLogout activeView={activeView} setActiveView={setActiveView}>
       {renderContent()}
-    </AppLayout>
+    </AppLayoutWithLogout>
   );
 };
 

@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
-const AppLayout = ({ children, activeView, setActiveView }) => {
+const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
   const [open, setOpen] = React.useState(true);
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -99,7 +99,7 @@ const AppLayout = ({ children, activeView, setActiveView }) => {
             </>
           )}
 
-          <ListItem button onClick={logout}>
+          <ListItem button onClick={onLogout}>
             <ListItemIcon>
               <Logout />
             </ListItemIcon>

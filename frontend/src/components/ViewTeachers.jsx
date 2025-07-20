@@ -1,4 +1,3 @@
-// /src/pages/ViewTeachers.jsx
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../interceptor";
 import { Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, Button } from "@mui/material";
