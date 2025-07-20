@@ -8,8 +8,9 @@ import { useSelector } from "react-redux";
 const AdminDashboard = () => {
   const [activeView, setActiveView] = useState("dashboard");
   const name = useSelector((state) => state.user.name);
-  const AppLayoutWithLogout = withLogout(AppLayout);
 
+  const AppLayoutWithLogout = withLogout(AppLayout);
+  
   const renderContent = () => {
     switch (activeView) {
       case "viewStudents":
@@ -25,6 +26,7 @@ const AdminDashboard = () => {
   };
 
   return (
+
     <AppLayoutWithLogout activeView={activeView} setActiveView={setActiveView}>
       {renderContent()}
     </AppLayoutWithLogout>
