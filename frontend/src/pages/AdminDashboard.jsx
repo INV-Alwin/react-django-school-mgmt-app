@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import React, { useState } from "react";
 import AppLayout from "../layouts/AppLayout";
 import withLogout from "../hoc/withLogout";
 import AddTeacherForm from "../components/AddTeacherForm";

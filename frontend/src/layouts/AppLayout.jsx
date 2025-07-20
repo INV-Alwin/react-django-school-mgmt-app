@@ -15,12 +15,16 @@ import {
 import { Menu as MenuIcon, Dashboard, Logout } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
 const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
   const [open, setOpen] = React.useState(true);
   const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const role = localStorage.getItem("role"); 
   const navigate = useNavigate();
 
   const role = localStorage.getItem("role"); 
@@ -32,6 +36,11 @@ const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
+
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
 
       <AppBar
         position="fixed"
