@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import AppLayout from "../layouts/AppLayout";
 import withLogout from "../hoc/withLogout";
+import CreateExam from "../components/CreateExam";
 import ViewStudents from "../components/ViewStudents";
 import { useSelector } from "react-redux";
 
 
-const AdminDashboard = () => {
+const TeacherDashboard = () => {
   const [activeView, setActiveView] = useState("dashboard");
   const name = useSelector((state) => state.user.name);
   const AppLayoutWithLogout = withLogout(AppLayout);
@@ -14,6 +15,8 @@ const AdminDashboard = () => {
     switch (activeView) {
       case "viewStudents":
         return <ViewStudents />;
+      case "createExam":
+        return <CreateExam />;
       default:
         return (
           <>
@@ -31,4 +34,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default TeacherDashboard;
