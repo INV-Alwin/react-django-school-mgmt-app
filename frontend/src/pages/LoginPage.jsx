@@ -45,6 +45,12 @@ const LoginPage = () => {
         <Button variant="contained" color="primary" type="submit">
           Login
         </Button>
+        <Button
+          variant="outlined"
+          onClick={() => window.location.href = 'http://127.0.0.1:8000/password-reset/'}
+        >
+          Reset Password
+        </Button>
       </form>
     </AuthLayout>
   );
