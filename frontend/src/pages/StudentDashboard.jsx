@@ -20,12 +20,6 @@ const StudentDashboard = () => {
   const handleExamSubmitted = (scoreValue) => {
     setScore(scoreValue);
     setActiveView("Result");
-
-    setTimeout(() => {
-      setScore(null);
-      setSelectedExamId(null);
-      setActiveView("dashboard");
-    }, 5000); // redirect to dashboard after 5s
   };
 
   const renderContent = () => {

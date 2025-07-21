@@ -109,6 +109,9 @@ const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
               </ListItem>
             </>
           )}
+          <ListItem button onClick={() => window.open('http://127.0.0.1:8000/password-reset/', '_blank')}>
+            <ListItemText primary="Reset Password" />
+          </ListItem>
           <ListItem button onClick={onLogout}>
             <ListItemIcon>
               <Logout />
