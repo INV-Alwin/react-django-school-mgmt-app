@@ -10,7 +10,7 @@ from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
 from teachers.models import Teacher
 from rest_framework.decorators import action
-from exams.models import Exam
+from exams.models import Exam,StudentExam
 from rest_framework.exceptions import ValidationError
 
 
@@ -73,6 +73,25 @@ class QuestionViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
     
+    @action(detail=False, methods=["get"], url_path="by-exam/(?P<exam_id>[^/.]+)")
+    def by_exam(self, request, exam_id=None):
+        try:
+            exam = Exam.objects.get(id=exam_id)
+        except Exam.DoesNotExist:
+            return Response({"error": "Exam not found."}, status=404)
+
+        
+        if request.user.role == "teacher":
+            if exam.teacher.user != request.user:
+                return Response({"error": "You can only view your own exams."}, status=403)
+        elif request.user.role == "student":
+            if not exam.assigned_students.filter(user=request.user).exists():
+                return Response({"error": "This exam is not assigned to you."}, status=403)
+
+        questions = exam.questions.all()
+        serializer = self.get_serializer(questions, many=True)
+        return Response(serializer.data)
+    
 class AssignedExamsView(APIView):
     permission_classes = [IsStudent]
 
@@ -85,9 +104,23 @@ class AssignedExamsView(APIView):
         except:
             return Response({'error': 'Student profile not found'}, status=404)
 
-        exams = Exam.objects.filter(assigned_students=student)
-        serializer = ExamSerializer(exams, many=True)
-        return Response(serializer.data)
+        exams = Exam.objects.filter(assigned_students=student).distinct()
+        response_data = []
+
+        for exam in exams:
+            submission = StudentExam.objects.filter(exam=exam, student=student).first()
+            exam_data = {
+                "id": exam.id,
+                "title": exam.title,
+                "duration_minutes": exam.duration_minutes,
+                "teacher": exam.teacher.id,
+                "assigned_student_names": [s.user.get_full_name() for s in exam.assigned_students.all()],
+                "submitted": bool(submission),
+                "marks_obtained": submission.score if submission else None
+            }
+            response_data.append(exam_data)
+
+        return Response(response_data)
 
 class SubmitExamView(APIView):
     permission_classes = [IsStudent]

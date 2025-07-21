@@ -32,7 +32,7 @@ const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
 
-      {/* ✅ SINGLE AppBar */}
+      
       <AppBar
         position="fixed"
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -102,6 +102,13 @@ const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
             </>
           )}
 
+          {role === "student" && (
+            <>
+              <ListItem button onClick={() => setActiveView("Exam")}>
+                <ListItemText primary="Exam" />
+              </ListItem>
+            </>
+          )}
           <ListItem button onClick={onLogout}>
             <ListItemIcon>
               <Logout />

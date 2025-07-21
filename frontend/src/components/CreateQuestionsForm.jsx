@@ -11,8 +11,8 @@ import {
 import { useParams } from "react-router-dom";
 import axiosInstance from "../interceptor";
 
-const CreateQuestionsForm = () => {
-  const { examId } = useParams();
+const CreateQuestionsForm = ({ examId }) => {
+  //const { examId } = useParams();
   const { register, handleSubmit, control, reset } = useForm({
     defaultValues: {
       questions: Array(5).fill({ text: "", option1: "", option2: "", option3: "", option4: "", correct_option: 1 }),
@@ -22,28 +22,30 @@ const CreateQuestionsForm = () => {
   const { fields } = useFieldArray({ control, name: "questions" });
   const [snackbar, setSnackbar] = React.useState({ open: false, message: "", severity: "success" });
 
-  const onSubmit = async (data) => {
-    const payload = {
-      exam: parseInt(examId),
-      questions: data.questions.map((q) => ({
-        text: q.text,
-        option1: q.option1,
-        option2: q.option2,
-        option3: q.option3,
-        option4: q.option4,
-        correct_option: parseInt(q.correct_option),
-      })),
-    };
+const onSubmit = async (data) => {
+  console.log("examId raw:", examId);
+  console.log("Parsed examId:", parseInt(examId));
+  const optionLetter = ["A", "B", "C", "D"];
+  const exam_id = parseInt(examId);
+  const payload = data.questions.map((q) => ({
+    exam: exam_id,
+    question_text: q.text,
+    option_a: q.option1,
+    option_b: q.option2,
+    option_c: q.option3,
+    option_d: q.option4,
+    correct_option: optionLetter[parseInt(q.correct_option) - 1],
+  }));
 
-    try {
-      await axiosInstance.post("/api/exams/questions/bulk_create/", payload);
-      setSnackbar({ open: true, message: "Questions submitted!", severity: "success" });
-      reset();
-    } catch (error) {
-      setSnackbar({ open: true, message: "Submission failed", severity: "error" });
-      console.error(error.response?.data || error.message);
-    }
-  };
+  try {
+    await axiosInstance.post("exams/questions/bulk_create/", payload);
+    setSnackbar({ open: true, message: "Questions submitted!", severity: "success" });
+    reset();
+  } catch (error) {
+    setSnackbar({ open: true, message: "Submission failed", severity: "error" });
+    console.error(error.response?.data || error.message);
+  }
+};
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", p: 2, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
