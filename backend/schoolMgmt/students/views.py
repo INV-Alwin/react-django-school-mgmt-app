@@ -37,7 +37,11 @@ class ImportStudentsCSV(APIView):
         if not file:
             return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
-        decoded_file = file.read().decode('utf-8')
+        try:
+            decoded_file = file.read().decode('utf-8')
+        except UnicodeDecodeError:
+            file.seek(0)
+            decoded_file = file.read().decode('ISO-8859-1')
         reader = csv.DictReader(io.StringIO(decoded_file))
 
         created_count = 0
@@ -57,8 +61,9 @@ class ImportStudentsCSV(APIView):
 
             
             try:
-                teacher = Teacher.objects.get(employee_id=row['assigned_teacher'])
-            except Teacher.DoesNotExist:
+                first_name, last_name = row['assigned_teacher'].strip().split(" ", 1)
+                teacher = Teacher.objects.get(user__first_name=first_name, user__last_name=last_name)
+            except (ValueError, Teacher.DoesNotExist):
                 user.delete()
                 continue  
 
