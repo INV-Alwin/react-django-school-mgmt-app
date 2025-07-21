@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   TextField,
@@ -9,25 +9,12 @@ import {
   Alert,
 } from "@mui/material";
 import axiosInstance from "../interceptor";
-import { useNavigate } from "react-router-dom";
+import CreateQuestionsForm from "./CreateQuestionsForm";
 
-const CreateExamForm = () => {
+const CreateExam = () => {
   const { register, handleSubmit, reset } = useForm();
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (snackbar.open) {
-      const timer = setTimeout(() => {
-        setSnackbar((prev) => ({ ...prev, open: false }));
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [snackbar.open]);
-
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+  const [examId, setExamId] = useState(null); 
 
   const onSubmit = async (data) => {
     const payload = {
@@ -37,26 +24,21 @@ const CreateExamForm = () => {
     };
 
     try {
-      const response = await axiosInstance.post("/api/exams/exams/", payload);
-      const examId = response.data.id;
+      const response = await axiosInstance.post("exams/exams/", payload);
+      const newExamId = response.data.id;
 
-      setSnackbar({
-        open: true,
-        message: "Exam created successfully!",
-        severity: "success",
-      });
-
+      setSnackbar({ open: true, message: "Exam created successfully!", severity: "success" });
       reset();
-      navigate(`/create-questions/${examId}`); // Redirect to question creation
+      setExamId(newExamId); 
     } catch (error) {
       console.error(error.response?.data || error.message);
-      setSnackbar({
-        open: true,
-        message: "Failed to create exam.",
-        severity: "error",
-      });
+      setSnackbar({ open: true, message: "Failed to create exam.", severity: "error" });
     }
   };
+
+  if (examId) {
+    return <CreateQuestionsForm examId={examId} />;
+  }
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", minHeight: "100vh", alignItems: "center", backgroundColor: "#f9f9f9", p: 2 }}>
@@ -75,7 +57,7 @@ const CreateExamForm = () => {
         />
 
         {snackbar.open && (
-          <Alert severity={snackbar.severity} onClose={handleCloseSnackbar} sx={{ mt: 2 }}>
+          <Alert severity={snackbar.severity} sx={{ mt: 2 }}>
             {snackbar.message}
           </Alert>
         )}
@@ -88,4 +70,4 @@ const CreateExamForm = () => {
   );
 };
 
-export default CreateExamForm;
+export default CreateExam;

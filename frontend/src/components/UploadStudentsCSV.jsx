@@ -17,12 +17,16 @@ const UploadStudentsCSV = ({ onBack }) => {
     severity: "success",
   });
 
+  const [errorDetails, setErrorDetails] = useState(null); 
+
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
+    setErrorDetails(null); 
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!file) {
       setSnackbar({
         open: true,
@@ -36,7 +40,7 @@ const UploadStudentsCSV = ({ onBack }) => {
     formData.append("file", file);
 
     try {
-      await axiosInstance.post("/students/import/", formData, {
+      const response = await axiosInstance.post("/students/import/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -44,9 +48,10 @@ const UploadStudentsCSV = ({ onBack }) => {
 
       setSnackbar({
         open: true,
-        message: "CSV uploaded successfully!",
+        message: response.data?.message || "CSV uploaded successfully!",
         severity: "success",
       });
+      setErrorDetails(null);
       setFile(null);
     } catch (error) {
       setSnackbar({
@@ -54,7 +59,12 @@ const UploadStudentsCSV = ({ onBack }) => {
         message: "CSV upload failed.",
         severity: "error",
       });
-      console.error(error.response?.data || error.message);
+
+      
+      setErrorDetails(
+        error.response?.data?.detail || error.response?.data || "Unexpected error occurred."
+      );
+      console.error("Upload error:", error.response?.data || error.message);
     }
   };
 
@@ -96,14 +106,19 @@ const UploadStudentsCSV = ({ onBack }) => {
           <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
         )}
 
+        {errorDetails && (
+          <Alert severity="error" sx={{ whiteSpace: "pre-wrap" }}>
+            {typeof errorDetails === "string"
+              ? errorDetails
+              : JSON.stringify(errorDetails, null, 2)}
+          </Alert>
+        )}
+
         <Button type="submit" variant="contained">
           Submit CSV
         </Button>
 
-        <Button
-          variant="outlined"
-          onClick={onBack}
-        >
+        <Button variant="outlined" onClick={onBack}>
           Back to Add Student
         </Button>
       </Paper>

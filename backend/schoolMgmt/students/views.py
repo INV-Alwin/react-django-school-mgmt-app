@@ -42,16 +42,30 @@ class ImportStudentsCSV(APIView):
         except UnicodeDecodeError:
             file.seek(0)
             decoded_file = file.read().decode('ISO-8859-1')
+        
         reader = csv.DictReader(io.StringIO(decoded_file))
 
         created_count = 0
-        for row in reader:
-            if User.objects.filter(email=row['email']).exists():
-                continue  # Skip if email already exists
+        errors = []
 
+        for index, row in enumerate(reader, start=2):  
+            email = row['email']
+            roll_number = row['roll_number']
+
+            
+            if User.objects.filter(email=email).exists():
+                errors.append(f"Row {index}: Email '{email}' already exists.")
+                continue
+
+            
+            if Student.objects.filter(roll_number=roll_number).exists():
+                errors.append(f"Row {index}: Roll number '{roll_number}' already exists.")
+                continue
+
+            
             user = User.objects.create_user(
-                username=row['email'],
-                email=row['email'],
+                username=email,
+                email=email,
                 password='student@123',
                 role='student',
                 first_name=row['first_name'],
@@ -64,12 +78,14 @@ class ImportStudentsCSV(APIView):
                 first_name, last_name = row['assigned_teacher'].strip().split(" ", 1)
                 teacher = Teacher.objects.get(user__first_name=first_name, user__last_name=last_name)
             except (ValueError, Teacher.DoesNotExist):
-                user.delete()
-                continue  
+                user.delete()  
+                errors.append(f"Row {index}: Assigned teacher '{row['assigned_teacher']}' not found.")
+                continue
 
+            
             Student.objects.create(
                 user=user,
-                roll_number=row['roll_number'],
+                roll_number=roll_number,
                 student_class=row['student_class'],
                 date_of_birth=row['date_of_birth'],
                 admission_date=row['admission_date'],
@@ -79,7 +95,10 @@ class ImportStudentsCSV(APIView):
 
             created_count += 1
 
-        return Response({'message': f'Successfully imported {created_count} students'}, status=status.HTTP_201_CREATED)
+        return Response({
+            'message': f'Successfully imported {created_count} students',
+            'errors': errors
+        }, status=status.HTTP_201_CREATED if created_count else status.HTTP_400_BAD_REQUEST)
 
     
 class StudentMeView(APIView):

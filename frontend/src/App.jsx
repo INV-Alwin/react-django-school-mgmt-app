@@ -6,6 +6,7 @@ import { store } from "./redux/store";
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import StudentDashboard from "./pages/StudentDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import './App.css';
@@ -32,6 +33,14 @@ function App() {
             element={
               <ProtectedRoute role="teacher">
                 <TeacherDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/dashboard"
+            element={
+              <ProtectedRoute role="student">
+                <StudentDashboard />
               </ProtectedRoute>
             }
           />
