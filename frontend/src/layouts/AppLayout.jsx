@@ -15,18 +15,13 @@ import {
 import { Menu as MenuIcon, Dashboard, Logout } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
 const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
   const [open, setOpen] = React.useState(true);
-  const { logout } = useAuth();
+  const { logout } = useAuth(); 
   const navigate = useNavigate();
-
-  const role = localStorage.getItem("role"); 
-  const navigate = useNavigate();
-
   const role = localStorage.getItem("role"); 
 
   const toggleDrawer = () => {
@@ -37,11 +32,7 @@ const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
 
-      <AppBar
-        position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      >
-
+      {/* ✅ SINGLE AppBar */}
       <AppBar
         position="fixed"
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -76,12 +67,12 @@ const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
       >
         <Toolbar />
         <List>
-            <ListItem button onClick={() => setActiveView("dashboard")}> 
-              <ListItemIcon>
-                <Dashboard />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItem>
+          <ListItem button onClick={() => setActiveView("dashboard")}>
+            <ListItemIcon>
+              <Dashboard />
+            </ListItemIcon>
+            <ListItemText primary="Dashboard" />
+          </ListItem>
 
           {role === "admin" && (
             <>

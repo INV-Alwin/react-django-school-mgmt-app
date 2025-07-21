@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import UploadStudentsCSV from "../components/UploadStudentsCSV";
 import {
   TextField,
   Button,
@@ -12,6 +13,8 @@ import axiosInstance from "../interceptor";
 
 const AddStudentForm = () => {
   const { register, handleSubmit, reset } = useForm();
+
+  const [showCSV, setShowCSV] = useState(false); // 👈 toggle view
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -66,6 +69,10 @@ const AddStudentForm = () => {
     }
   };
 
+  if (showCSV) {
+    return <UploadStudentsCSV onBack={() => setShowCSV(false)} />;
+  }
+
   return (
     <Box
       sx={{
@@ -109,7 +116,7 @@ const AddStudentForm = () => {
           InputLabelProps={{ shrink: true }}
           {...register("date_of_birth")}
         />
-                <TextField
+        <TextField
           type="date"
           label="Date of Admission"
           InputLabelProps={{ shrink: true }}
@@ -117,7 +124,7 @@ const AddStudentForm = () => {
         />
         <TextField label="Status" defaultValue="active" {...register("status")} />
         <TextField label="Assigned Teacher" {...register("assigned_teacher")} />
-        
+
         {snackbar.open && (
           <Alert
             severity={snackbar.severity}
@@ -130,6 +137,13 @@ const AddStudentForm = () => {
 
         <Button type="submit" variant="contained">
           Submit
+        </Button>
+
+        <Button
+          variant="outlined"
+          onClick={() => setShowCSV(true)} // 👈 switch view to UploadStudentsCSV
+        >
+          Upload CSV
         </Button>
       </Paper>
     </Box>
