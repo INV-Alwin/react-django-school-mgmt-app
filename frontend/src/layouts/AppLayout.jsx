@@ -96,6 +96,9 @@ const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
               <ListItem button onClick={() => setActiveView("viewStudents")}>
                 <ListItemText primary="View Students" />
               </ListItem>
+              <ListItem button onClick={() => setActiveView("createExam")}>
+                <ListItemText primary="Create Exam" />
+              </ListItem>
             </>
           )}
 
