@@ -1,19 +1,30 @@
 from rest_framework import viewsets, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
+from django.http import HttpResponse
+from django.utils.dateparse import parse_date
+import csv
+import io
+
 from .models import Teacher
 from users.models import User
 from .serializers import TeacherSerializer
 from users.permissions import IsAdmin
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAdminUser
-from django.http import HttpResponse
-from rest_framework.response import Response
-import csv
-import io
+
 
 class TeacherViewSet(viewsets.ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
     permission_classes = [IsAdmin]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = instance.user  # get the linked User before deleting
+        self.perform_destroy(instance)  # delete the Teacher
+        user.delete()  # delete the associated User
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ImportTeachersCSV(APIView):
     permission_classes = [IsAdmin]
@@ -27,34 +38,42 @@ class ImportTeachersCSV(APIView):
         reader = csv.DictReader(io.StringIO(decoded_file))
 
         created_count = 0
-        for row in reader:
-            if User.objects.filter(email=row['email']).exists():
-                continue  # Skip if email already exists
+        errors = []
 
-            user = User.objects.create_user(
-                username=row['email'],
-                email=row['email'],
-                password='teacher@123',
-                role='teacher',
-                first_name=row['first_name'],
-                last_name=row['last_name'],
-                phone_number=row['phone_number']
-            )
+        for i, row in enumerate(reader, start=1):
+            user_data = {
+                'first_name': row.get('first_name', '').strip(),
+                'last_name': row.get('last_name', '').strip(),
+                'email': row.get('email', '').strip(),
+                'phone_number': row.get('phone_number', '').strip(),
+            }
 
-            Teacher.objects.create(
-                user=user,
-                subject_specialization=row['subject_specialization'],
-                employee_id=row['employee_id'],
-                date_of_joining=row['date_of_joining'],
-                status=row['status'].lower()
-            )
-            created_count += 1
+            teacher_data = {
+                'user': user_data,
+                'subject_specialization': row.get('subject_specialization', '').strip(),
+                'employee_id': row.get('employee_id', '').strip(),
+                'date_of_joining': parse_date(row.get('date_of_joining', '').strip()),
+                'status': row.get('status', '').strip().lower()
+            }
 
-        return Response({'message': f'Successfully imported {created_count} teachers'}, status=status.HTTP_201_CREATED)
+            serializer = TeacherSerializer(data=teacher_data)
+            if serializer.is_valid():
+                serializer.save()
+                created_count += 1
+            else:
+                errors.append({f'Row {i}': serializer.errors})
+
+        response_data = {
+            'message': f'Successfully imported {created_count} teachers',
+        }
+        if errors:
+            response_data['errors'] = errors
+
+        return Response(response_data, status=status.HTTP_201_CREATED if created_count else status.HTTP_400_BAD_REQUEST)
 
 
 class ExportTeachersCSV(APIView):
-    permission_classes = [IsAdmin]  
+    permission_classes = [IsAdmin]
 
     def get(self, request):
         response = HttpResponse(content_type='text/csv')

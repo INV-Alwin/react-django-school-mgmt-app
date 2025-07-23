@@ -8,19 +8,21 @@ import {
   Box,
   Paper,
   Alert,
+  MenuItem,
 } from "@mui/material";
 import axiosInstance from "../interceptor";
 
 const AddStudentForm = () => {
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
-  const [showCSV, setShowCSV] = useState(false); // 👈 toggle view
+  const [showCSV, setShowCSV] = useState(false); 
 
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
+
 
   useEffect(() => {
     if (snackbar.open) {
@@ -104,26 +106,64 @@ const AddStudentForm = () => {
           Add New Student
         </Typography>
 
-        <TextField label="First Name" {...register("first_name")} />
-        <TextField label="Last Name" {...register("last_name")} />
-        <TextField label="Email" {...register("email")} />
-        <TextField label="Phone Number" {...register("phone_number")} />
-        <TextField label="Roll Number" {...register("roll_number")} />
-        <TextField label="Class" {...register("student_class")} />
+        <TextField
+          label="First Name"
+          {...register("first_name", { required: "First name is required" })}
+          error={!!errors.first_name}
+          helperText={errors.first_name?.message}
+        />
+        <TextField label="Last Name" {...register("last_name",{ required: "Last name is required" })} 
+          error={!!errors.last_name}
+          helperText={errors.last_name?.message} 
+        />
+        <TextField label="Email" {...register("email",{ required: "Email is required" })} 
+          error={!!errors.email}
+          helperText={errors.email?.message}
+        />
+        <TextField label="Phone Number" {...register("phone_number",{ required: "Phone Number is required" })} 
+          error={!!errors.phone_number}
+          helperText={errors.phone_number?.message}
+        />
+        <TextField label="Roll Number" {...register("roll_number",{ required: "Roll Number is required" })} 
+          error={!!errors.roll_number}
+          helperText={errors.roll_number?.message}
+        />
+        <TextField label="Class" {...register("student_class",{ required: "Class is required" })} 
+          error={!!errors.student_class}
+          helperText={errors.student_class?.message}
+        />
         <TextField
           type="date"
           label="Date of Birth"
           InputLabelProps={{ shrink: true }}
-          {...register("date_of_birth")}
+          {...register("date_of_birth",{ required: "Date of Birth is required" })}
+          error={!!errors.date_of_birth}
+          helperText={errors.date_of_birth?.message}
         />
         <TextField
           type="date"
           label="Date of Admission"
           InputLabelProps={{ shrink: true }}
-          {...register("admission_date")}
+          {...register("admission_date",{ required: "Date of Admission is required" })}
+          error={!!errors.admission_date}
+          helperText={errors.admission_date?.message}
         />
-        <TextField label="Status" defaultValue="active" {...register("status")} />
-        <TextField label="Assigned Teacher" {...register("assigned_teacher")} />
+        <TextField
+          select
+          label="Status"
+          defaultValue="active"
+          {...register("status", { required: "Status is required" })}
+          error={!!errors.status}
+          helperText={errors.status?.message}
+          fullWidth
+        >
+          <MenuItem value="active">Active</MenuItem>
+          <MenuItem value="inactive">Inactive</MenuItem>
+        </TextField>
+        <TextField label="Assigned Teacher" {...register("assigned_teacher", { required: "Assigned Teacher is required" })} 
+          error={!!errors.assigned_teacher}
+          helperText={errors.assigned_teacher?.message}
+        />
 
         {snackbar.open && (
           <Alert
@@ -141,7 +181,7 @@ const AddStudentForm = () => {
 
         <Button
           variant="outlined"
-          onClick={() => setShowCSV(true)} // 👈 switch view to UploadStudentsCSV
+          onClick={() => setShowCSV(true)} 
         >
           Upload CSV
         </Button>

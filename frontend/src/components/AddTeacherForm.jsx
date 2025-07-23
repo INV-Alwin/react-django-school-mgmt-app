@@ -11,7 +11,7 @@ import {
 import axiosInstance from "../interceptor";
 
 const AddTeacherForm = () => {
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -95,7 +95,9 @@ const AddTeacherForm = () => {
           Add New Teacher
         </Typography>
 
-        <TextField label="First Name" {...register("first_name")} />
+        <TextField label="First Name" {...register("first_name", { required: "First name is required" })}
+        
+        />
         <TextField label="Last Name" {...register("last_name")} />
         <TextField label="Email" {...register("email")} />
         <TextField label="Phone Number" {...register("phone_number")} />

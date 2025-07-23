@@ -46,9 +46,19 @@ const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             School Management System
           </Typography>
+
+   
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <ListItem button onClick={onLogout} sx={{ color: "inherit", padding: 0 }}>
+              <ListItemIcon sx={{ color: "inherit", minWidth: "auto", marginRight: 1 }}>
+                <Logout />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItem>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -57,11 +67,19 @@ const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
         anchor="left"
         open={open}
         sx={{
-          width: drawerWidth,
+          width: open
+            ? { xs: 180, sm: 220, md: 240 } 
+            : 0,
           flexShrink: 0,
+          whiteSpace: 'nowrap',
+          transition: 'width 0.3s',
           "& .MuiDrawer-paper": {
-            width: drawerWidth,
+            width: open
+              ? { xs: 180, sm: 220, md: 240 }
+              : 0,
+            transition: 'width 0.3s',
             boxSizing: "border-box",
+            overflowX: 'hidden',
           },
         }}
       >
@@ -109,26 +127,20 @@ const AppLayout = ({ children, activeView, setActiveView, onLogout }) => {
               </ListItem>
             </>
           )}
-          <ListItem button onClick={() => window.open('http://127.0.0.1:8000/password-reset/', '_blank')}>
-            <ListItemText primary="Reset Password" />
-          </ListItem>
-          <ListItem button onClick={onLogout}>
-            <ListItemIcon>
-              <Logout />
-            </ListItemIcon>
-            <ListItemText primary="Logout" />
-          </ListItem>
         </List>
       </Drawer>
 
       <Box
         component="main"
-        sx={{
+        sx={(theme) => ({
           flexGrow: 1,
           padding: 3,
           marginLeft: open ? `${drawerWidth}px` : 0,
-          transition: "margin 0.3s",
-        }}
+          transition: theme.transitions.create("margin", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
+        })}
       >
         <Toolbar />
         {children}

@@ -28,6 +28,13 @@ class StudentViewSet(viewsets.ModelViewSet):
         elif user.role == 'teacher':
             return Student.objects.filter(assigned_teacher__user=user)
         return Student.objects.none()
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = instance.user
+        self.perform_destroy(instance)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class ImportStudentsCSV(APIView):
     permission_classes = [IsAdmin]
